@@ -3,18 +3,12 @@ from os import environ
 
 load_dotenv("config.env")
 
-BOT_TOKEN = environ.get("BOT_TOKEN", None)
-API_ID = int(environ.get("API_ID", 6))
-API_HASH = environ.get("API_HASH", "eb06d4abfb49dc3eeb1aeb98ae0f581e")
-API_ID1 = int(environ.get("API_ID1", 6))
-API_HASH1 = environ.get("API_HASH1", "eb06d4abfb49dc3eeb1aeb98ae0f581e")
-SUDO_USERS_ID = [int(x) for x in environ.get("SUDO_USERS_ID", "").split()]
-LOG_GROUP_ID = int(environ.get("LOG_GROUP_ID", None))
-BASE_DB = environ.get("BASE_DB", None)
-MONGO_URL = environ.get("MONGO_URL", None)
-ARQ_API_URL = environ.get("ARQ_API_URL", None)
-ARQ_API_KEY = environ.get("ARQ_API_KEY", None)
-COMMAND_PREFIXES = environ.get("COMMAND_PREFIXES", None)
+# توکن ربات (از @BotFather دریافت میشود)
+BOT_TOKEN = "7755697406:AAEKh6UjYGo4GCUdVk5N_NeQhzAGDsVQIy4"
 
+# اطلاعات مالک ربات
+OWNER_ID = 7824772776  # آیدی عددی مالک
+OWNER_USERNAME = "@Secretgpbot"  # یوزرنیم مالک
 
-
+# تنظیمات حق اشتراک
+DEFAULT_SUBSCRIPTION_DAYS = 30  # مدت پیشفرض شارژ (روز)
