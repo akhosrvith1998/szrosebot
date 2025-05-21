@@ -15,6 +15,9 @@ from pyrogram.errors import (
 from asyncio import sleep
 from time import time
 import os
+from Rose.mongo.subsdb import Subscriptions
+from Rose.mongo.warndb import Warns
+from datetime import datetime, timedelta
 from pyrogram import filters
 from pyrogram.types import Message
 from Rose.plugins.rules import *
@@ -402,4 +405,66 @@ Make it easy to promote and demote users with the admin module!
 Sometimes, you promote or demote an admin manually, and Rose doesn't realise it immediately. This is because to avoid spamming telegram servers, admin status is cached locally.
 This means that you sometimes have to wait a few minutes for admin rights to update. If you want to update them immediately, you can use the /reload command;
 that'll force Rose to check who the admins are again. 
+"""
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+
+@app.on_message(filters.command(["بن", "ban"]) & admin_filter)
+async def ban_command(client, message: Message):
+    if not message.reply_to_message:
+        return await message.reply("⚠️ لطفاً به پیام کاربر ریپلای کنید!")
+    
+    user_id = message.reply_to_message.from_user.id
+    try:
+        await client.ban_chat_member(message.chat.id, user_id)
+        await message.reply(f"✅ کاربر {user_id} با موفقیت بن شد!")
+    except Exception as e:
+        await message.reply(f"❌ خطا: {str(e)}")
+
+# ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+
+@app.on_message(filters.command(["سکوت", "mute"]) & admin_filter)
+async def mute_command(client, message: Message):
+    if not message.reply_to_message:
+        return await message.reply("⚠️ لطفاً به پیام کاربر ریپلای کنید!")
+    
+    user_id = message.reply_to_message.from_user.id
+    try:
+        await client.restrict_chat_member(
+            message.chat.id,
+            user_id,
+            ChatPermissions(can_send_messages=False)
+        await message.reply(f"🔇 کاربر {user_id} سکوت شد!")
+    except Exception as e:
+        await message.reply(f"❌ خطا: {str(e)}")
+
+# ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+
+@app.on_message(filters.command(["اخطار", "warn"]) & admin_filter)
+async def warn_command(client, message: Message):
+    if not message.reply_to_message:
+        return await message.reply("⚠️ لطفاً به پیام کاربر ریپلای کنید!")
+    
+    user_id = message.reply_to_message.from_user.id
+    Warns.add_warn(user_id, message.chat.id)
+    await message.reply(f"⚠️ به کاربر {user_id} اخطار داده شد!")
+
+# ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+
+@app.on_message(filters.command(["شارژ", "charge"]) & owner_filter)
+async def charge_command(client, message: Message):
+    try:
+        days = int(message.command[1])
+        Subscriptions.update_sub(message.chat.id, days)
+        await message.reply(f"♻️ اشتراک گروه برای {days} روز تمدید شد!")
+    except (IndexError, ValueError):
+        await message.reply("⚠️ فرمت صحیح: /شارژ [تعداد روز]")
+
+# ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+
+__HELP__ += """
+\n\n**🛠 دستورات جدید مدیریتی:**
+- /بن [ریپلای] - بن کاربر
+- /سکوت [ریپلای] - محدود کردن کاربر
+- /اخطار [ریپلای] - اخطار به کاربر
+- /شارژ [روز] - شارژ گروه (فقط مالک)
 """
